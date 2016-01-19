@@ -35,7 +35,7 @@ class ViewJournalController: UIViewController,CLLocationManagerDelegate,MKMapVie
         
 
         
-        println("IN VIEW PAGE: \(currentJournal)")
+        print("IN VIEW PAGE: \(currentJournal)")
 
         // Do any additional setup after loading the view.
     }
@@ -44,14 +44,14 @@ class ViewJournalController: UIViewController,CLLocationManagerDelegate,MKMapVie
         
         super.viewWillAppear(animated)
         titleLabel.text=currentJournal?.title
-        println("\(currentJournal!.title) -->latitude test")
+        print("\(currentJournal!.title) -->latitude test")
         //bodyLabel.text=currentJournal?.body
         bodyText.text=currentJournal?.body
         //timeLabel.text=currentJournal?.time
         timeLabel.text = currentJournal?.getTimeAsString()
         //imgs = currentJournal?.images
         imgs = currentJournal?.getImages()
-        println("IN IN Controller: SIZE: \(imgs?.count)")
+        print("IN IN Controller: SIZE: \(imgs?.count)")
         
         imageCollection.delegate = self
         imageCollection.dataSource = self
@@ -76,7 +76,7 @@ class ViewJournalController: UIViewController,CLLocationManagerDelegate,MKMapVie
     }
     
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section:Int)->Int{
-        println(imgs!.count)
+        print(imgs!.count)
         return imgs!.count
 
     }
@@ -87,7 +87,7 @@ class ViewJournalController: UIViewController,CLLocationManagerDelegate,MKMapVie
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("viewImageCell", forIndexPath: indexPath) as! viewImageCell
-        print("\(indexPath.row) indexpath row")
+        print("\(indexPath.row) indexpath row", terminator: "")
         
         cell.image.image = imgs?[indexPath.row]
         

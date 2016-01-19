@@ -80,7 +80,7 @@ class AddJournalViewController: UIViewController,UICollectionViewDataSource,UIIm
             if let appDelegate = UIApplication.sharedApplication().delegate as? AppDelegate{
                 managedObjectContext = appDelegate.managedObjectContext
             }
-            println("context??AtTOp -> \(managedObjectContext)")
+            print("context??AtTOp -> \(managedObjectContext)")
 
             
         //check if folder exists
@@ -138,23 +138,23 @@ class AddJournalViewController: UIViewController,UICollectionViewDataSource,UIIm
     }
 
     //get location
-    func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!){
-        var latestLocation: AnyObject = locations[locations.count - 1]
+    func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]){
+        let latestLocation: AnyObject = locations[locations.count - 1]
         
         location = latestLocation as! CLLocation
         latitude = location.coordinate.latitude.description
         longitude = location.coordinate.longitude.description
-        println("Latitude: \(latitude), Longtitude: \(longitude)")
+        print("Latitude: \(latitude), Longtitude: \(longitude)")
         
     }
     
-    func locationManager(manager: CLLocationManager!,didFailWithError error: NSError!){
+    func locationManager(manager: CLLocationManager,didFailWithError error: NSError){
         
     }
     
     //add pictures
     @IBAction func addPicture(sender: AnyObject) {
-        var controller = UIImagePickerController()
+        let controller = UIImagePickerController()
         if(UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.Camera))
         {
             controller.sourceType=UIImagePickerControllerSourceType.Camera
@@ -212,7 +212,7 @@ class AddJournalViewController: UIViewController,UICollectionViewDataSource,UIIm
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("ImageCell", forIndexPath: indexPath) as! imageCell
-        print(indexPath.row)
+        print(indexPath.row, terminator: "")
             cell.imageView.image=imgs?[indexPath.row]
         return cell
     }
@@ -232,9 +232,9 @@ class AddJournalViewController: UIViewController,UICollectionViewDataSource,UIIm
     @IBAction func saveJournal(sender: AnyObject) {
         //time = dateFormatter.stringFromDate(NSDate())
         //var journal:Journal = Journal()
-        println("context?? -> \(managedObjectContext)")
-        var journal = NSEntityDescription.insertNewObjectForEntityForName("Journal", inManagedObjectContext: managedObjectContext!) as? Journal
-        journal!.title = titleText.text
+        print("context?? -> \(managedObjectContext)")
+        let journal = NSEntityDescription.insertNewObjectForEntityForName("Journal", inManagedObjectContext: managedObjectContext!) as? Journal
+        journal!.title = titleText.text!
         journal!.body = bodyTextBig.text
         //journal.getTimeAsString()
         journal!.time = NSDate()
@@ -243,16 +243,20 @@ class AddJournalViewController: UIViewController,UICollectionViewDataSource,UIIm
         journal!.latitude = latitude
         
         //var journal = Journal(title: titleText.text,body:bodyTextBig.text,images:imgs,time:time,longitude:longitude,latitude:latitude)
-        print("\(longitude) , \(latitude)")
-        print("Imgs size: \(imgs!.count)")
+        print("\(longitude) , \(latitude)", terminator: "")
+        print("Imgs size: \(imgs!.count)", terminator: "")
         //delegate?.saveJournal(journal!)
         
         var error: NSError? = nil
         
-        managedObjectContext?.save(&error)
+        do {
+            try managedObjectContext?.save()
+        } catch let error1 as NSError {
+            error = error1
+        }
         if (error != nil)
         {
-            println("could not save :\(error), \(error?.userInfo)")
+            print("could not save :\(error), \(error?.userInfo)")
         }
         
           self.dismissViewControllerAnimated(true, completion: nil)

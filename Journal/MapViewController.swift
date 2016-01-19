@@ -45,7 +45,13 @@ class MapViewController: UIViewController,CLLocationManagerDelegate,MKMapViewDel
         }
         //println("context??ListView -> \(managedObjectContext)")
         
-        fetchData()
+        
+        do {
+            try fetchData()
+        }catch{
+            print(error)
+        }
+
         
         //put markers...
         
@@ -61,24 +67,25 @@ class MapViewController: UIViewController,CLLocationManagerDelegate,MKMapViewDel
         mapView.delegate = self
     }
     
-    func fetchData(){
+    func fetchData() throws{
         //journalList = [Journal]()
         let fetch = NSFetchRequest(entityName:"Journal")
         let dataSort = NSSortDescriptor(key:"time",ascending:false)
         fetch.sortDescriptors = [dataSort]
-        var fetchError:NSError?
+        let fetchError:NSError?
         //println("context??InFetch -> \(managedObjectContext)")
         
-        if let fetchResults = managedObjectContext?.executeFetchRequest(fetch, error: &fetchError) as? [Journal]{
+        if let fetchResults = try managedObjectContext?.executeFetchRequest(fetch) as? [Journal]{
             for journal in fetchResults{
-                println("Fecthed ->  \(journal.title)")
+                print("Fecthed ->  \(journal.title)")
                 journalList.append(journal)
             }
         }
         else{
-            println("Fetch failed: \(fetchError),\(fetchError!.userInfo)")
+            //print("Fetch failed: \(fetchError),\(fetchError!.userInfo)")
+            print("Fetch failed")
         }
-        println("How Many data fetched in MapViewController? \(journalList.count)")
+        print("How Many data fetched in MapViewController? \(journalList.count)")
     }
 
 
@@ -88,19 +95,19 @@ class MapViewController: UIViewController,CLLocationManagerDelegate,MKMapViewDel
     }
     
     
-    func mapView(mapView: MKMapView!, viewForAnnotation annotation: MKAnnotation!) -> MKAnnotationView! {
+    func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
         let identifier = "JournalAnnotation"
         if annotation.isKindOfClass(JournalAnnotation.self){
             var annotationView = mapView.dequeueReusableAnnotationViewWithIdentifier(identifier)
             if annotationView == nil{
                 annotationView = MKPinAnnotationView(annotation:annotation, reuseIdentifier:identifier)
-                annotationView.enabled = true
-                annotationView.canShowCallout = true
+                annotationView!.enabled = true
+                annotationView!.canShowCallout = true
                 
-                let btn = UIButton.buttonWithType(.DetailDisclosure) as! UIButton
-                annotationView.rightCalloutAccessoryView = btn
+                let btn = UIButton(type: .DetailDisclosure)
+                annotationView!.rightCalloutAccessoryView = btn
             }else{
-                annotationView.annotation = annotation
+                annotationView!.annotation = annotation
             }
             
             return annotationView
@@ -109,11 +116,11 @@ class MapViewController: UIViewController,CLLocationManagerDelegate,MKMapViewDel
         return nil
     }
     
-    func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, calloutAccessoryControlTapped control: UIControl!) {
+    func mapView(mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
         
         let journalAnno = view.annotation as! JournalAnnotation
         let title = journalAnno.title
-        jtitle = title
+        jtitle = title!
         //let ac = UIAlertController(title: title, message: "testMessage", preferredStyle: .Alert)
         //ac.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
         //presentViewController(ac,animated:true, completion:nil)
@@ -123,17 +130,17 @@ class MapViewController: UIViewController,CLLocationManagerDelegate,MKMapViewDel
         var journalSelected:Journal
         
         for j in journalList{
-            var count:Int = 0
+            let count:Int = 0
             if count < journalList.count && j.title == journalList[count].title {
                 journalSelected = journalList[count]
-                println("Selected Journal is \(journalSelected)")
+                print("Selected Journal is \(journalSelected)")
                 nextViewController.currentJournal = journalSelected
             }
             else if count == journalList.count{
             }
         }
         
-        println("Next Current Journa: \(nextViewController.currentJournal)")
+        print("Next Current Journa: \(nextViewController.currentJournal)")
         
         self.presentViewController(nextViewController,animated: true,completion:nil)
         

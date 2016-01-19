@@ -8,7 +8,7 @@ class JournalListViewController: UITableViewController {
     
     
     
-    override func viewDidLoad() {
+    override func viewDidLoad(){
         super.viewDidLoad()
         var imgs :[UIImage] = [UIImage]()
         //journalList.append(Journal(title:"First Title Test", body:"First Body Test", images:imgs))
@@ -18,8 +18,12 @@ class JournalListViewController: UITableViewController {
         }
         //println("context??ListView -> \(managedObjectContext)")
 
-        fetchData()
-        
+        do {
+            try fetchData()
+        }catch{
+            print(error)
+        }
+            
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
         
@@ -27,7 +31,11 @@ class JournalListViewController: UITableViewController {
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
     override func viewWillAppear(animated: Bool) {
-        fetchData()
+        do {
+            try fetchData()
+        }catch{
+            print(error)
+        }
         self.tableView.reloadData()
     }
     
@@ -58,29 +66,29 @@ class JournalListViewController: UITableViewController {
         
         // Configure the cell...
         
-        var selectedJournal = journalList[indexPath.row]
+        let selectedJournal = journalList[indexPath.row]
         cell.titleText.text = selectedJournal.title
         //cell.bodyText.text = selectedJournal.body
         
         return cell
     }
     
-    func fetchData(){
+    func fetchData() throws{
         journalList = [Journal]()
         let fetch = NSFetchRequest(entityName:"Journal")
         let dataSort = NSSortDescriptor(key:"time",ascending:false)
         fetch.sortDescriptors = [dataSort]
-        var fetchError:NSError?
+        let fetchError:NSError?
         //println("context??InFetch -> \(managedObjectContext)")
 
-        if let fetchResults = managedObjectContext?.executeFetchRequest(fetch, error: &fetchError) as? [Journal]{
+        if let fetchResults = try managedObjectContext?.executeFetchRequest(fetch) as? [Journal]{
             for journal in fetchResults{
-                println("Fecthed ->  \(journal.title)")
+                print("Fecthed ->  \(journal.title)")
                 journalList.append(journal)
             }
         }
         else{
-            println("Fetch failed: \(fetchError),\(fetchError!.userInfo)")
+            print("Fetch failed:") //\(fetchError),\(fetchError!.userInfo)", terminator: "")
         }
         //println("How Many data fetched? \(journalList.count)")
     }
@@ -100,8 +108,8 @@ class JournalListViewController: UITableViewController {
         }
         if(segue.identifier == "viewJournalSegue")
         {
-            var controller = segue.destinationViewController as! ViewJournalController
-            let path = tableView.indexPathForSelectedRow()!
+            let controller = segue.destinationViewController as! ViewJournalController
+            let path = tableView.indexPathForSelectedRow!
             controller.currentJournal = journalList[path.row]
         }
 }

@@ -42,9 +42,9 @@ class Journal: NSManagedObject{
     }*/
     
     func setImageData(imageCollection:[UIImage]){
-        var CDArray = NSMutableArray()
+        let CDArray = NSMutableArray()
         for img in imageCollection{
-            let data:NSData = NSData(data:UIImagePNGRepresentation(img))
+            let data:NSData = NSData(data:UIImagePNGRepresentation(img)!)
             CDArray.addObject(data)
         }
         images = NSKeyedArchiver.archivedDataWithRootObject(CDArray)
@@ -61,7 +61,7 @@ class Journal: NSManagedObject{
     }
     
     func getTimeAsString() -> String {
-        var dateFormatter:NSDateFormatter = NSDateFormatter()
+        let dateFormatter:NSDateFormatter = NSDateFormatter()
         dateFormatter.timeStyle = NSDateFormatterStyle.MediumStyle
         dateFormatter.dateStyle = NSDateFormatterStyle.MediumStyle
         dateFormatter.timeZone = NSTimeZone()
